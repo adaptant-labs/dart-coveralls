@@ -11,13 +11,13 @@ import 'command_line.dart';
 class CalcPart extends CommandLinePart {
   CalcPart() : super(_initializeParser());
 
-  Future execute(ArgResults res) async {
-    if (res["help"]) {
+  Future execute(ArgResults? res) async {
+    if (res!["help"]) {
       print(parser.usage);
       return;
     }
 
-    FileSystemEntity pRoot = handlePackages(res);
+    FileSystemEntity? pRoot = handlePackages(res);
     if (pRoot == null) {
       return;
     }
@@ -44,7 +44,7 @@ class CalcPart extends CommandLinePart {
     var r = await collector.getLcovInformation(file);
 
     if (res["output"] != null) {
-      await new File(res["output"]).writeAsString(r);
+      await new File(res["output"]).writeAsString(r!);
     } else {
       print(r);
     }

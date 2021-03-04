@@ -8,8 +8,8 @@ class ProcessSystem {
   const ProcessSystem();
 
   ProcessResult runProcessSync(String executable, List<String> arguments,
-      {String workingDirectory,
-      Map<String, String> environment,
+      {String? workingDirectory,
+      Map<String, String>? environment,
       bool includeParentEnvironment: true,
       bool runInShell: false,
       Encoding stdoutEncoding: systemEncoding,
@@ -24,8 +24,8 @@ class ProcessSystem {
   }
 
   Future<ProcessResult> runProcess(String executable, List<String> arguments,
-      {String workingDirectory,
-      Map<String, String> environment,
+      {String? workingDirectory,
+      Map<String, String>? environment,
       bool includeParentEnvironment: true,
       bool runInShell: false,
       Encoding stdoutEncoding: systemEncoding,
@@ -40,8 +40,8 @@ class ProcessSystem {
   }
 
   Future<Process> startProcess(String executable, List<String> arguments,
-      {String workingDirectory,
-      Map<String, String> environment,
+      {String? workingDirectory,
+      Map<String, String>? environment,
       bool includeParentEnvironment: true,
       bool runInShell: false,
       ProcessStartMode mode: ProcessStartMode.normal}) {

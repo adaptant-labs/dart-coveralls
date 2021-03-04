@@ -12,8 +12,8 @@ import "command_line.dart";
 class ReportPart extends CommandLinePart {
   ReportPart() : super(_initializeParser());
 
-  Future execute(ArgResults res) async {
-    if (res["help"]) return print(parser.usage);
+  Future execute(ArgResults? res) async {
+    if (res!["help"]) return print(parser.usage);
 
     if (handleLogging(res) == false) {
       return null;
@@ -38,7 +38,7 @@ class ReportPart extends CommandLinePart {
     var excludeTestFiles = res["exclude-test-files"];
     var printJson = res["print-json"];
 
-    CoverallsResult result = await Chain.capture(() async {
+    CoverallsResult? result = await Chain.capture(() async {
       var commandLineClient = getCommandLineClient(res);
       if (commandLineClient == null) {
         return null;

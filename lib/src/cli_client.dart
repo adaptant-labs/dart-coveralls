@@ -15,21 +15,21 @@ import 'process_system.dart';
 import 'services/travis.dart' as travis;
 
 class CommandLineClient {
-  final String packagesPath;
-  final String packageRoot;
-  final String token;
+  final String? packagesPath;
+  final String? packageRoot;
+  final String? token;
 
   CommandLineClient._(this.packagesPath, this.packageRoot, this.token);
 
   factory CommandLineClient(
-      {String packageRoot,
-      String packagesPath,
-      String token,
-      Map<String, String> environment}) {
+      {String? packageRoot,
+      String? packagesPath,
+      String? token,
+      Map<String, String>? environment}) {
     return new CommandLineClient._(packagesPath, packageRoot, token);
   }
 
-  Future<String> getLcovResult(String testFile,
+  Future<String?> getLcovResult(String testFile,
       {ProcessSystem processSystem: const ProcessSystem()}) {
     var collector = new LcovCollector(
         packageRoot: packageRoot,
@@ -42,7 +42,7 @@ class CommandLineClient {
   /// `COVERALLS_TOKEN` if one is set. Otherwise; `null`.
   ///
   /// If [environment] is `null`, [Platform.environment] is used.
-  static String getToken(String candidate, [Map<String, String> environment]) {
+  static String? getToken(String? candidate, [Map<String, String>? environment]) {
     if (candidate != null && candidate.isNotEmpty) return candidate;
     if (null == environment) environment = Platform.environment;
 
@@ -52,15 +52,15 @@ class CommandLineClient {
     return environment['COVERALLS_TOKEN'];
   }
 
-  Future<CoverallsResult> reportToCoveralls(String testFile,
+  Future<CoverallsResult?> reportToCoveralls(String testFile,
       {ProcessSystem processSystem: const ProcessSystem(),
-      String coverallsAddress,
+      String? coverallsAddress,
       bool dryRun: false,
-      bool throwOnConnectivityError: false,
+      bool? throwOnConnectivityError: false,
       int retry: 0,
-      bool excludeTestFiles: false,
-      bool printJson}) async {
-    var rawLcov = await getLcovResult(testFile, processSystem: processSystem);
+      bool? excludeTestFiles: false,
+      required bool printJson}) async {
+    var rawLcov = await (getLcovResult(testFile, processSystem: processSystem) as FutureOr<String>);
 
     if (rawLcov == null) {
       print("Nothing to collect: Connection to VM service timed out. "
@@ -78,15 +78,15 @@ class CommandLineClient {
         printJson: printJson);
   }
 
-  Future<CoverallsResult> convertAndUploadToCoveralls(
+  Future<CoverallsResult?> convertAndUploadToCoveralls(
       Directory containsVmReports,
       {ProcessSystem processSystem: const ProcessSystem(),
-      String coverallsAddress,
+      String? coverallsAddress,
       bool dryRun: false,
-      bool throwOnConnectivityError: false,
+      bool? throwOnConnectivityError: false,
       int retry: 0,
-      bool excludeTestFiles: false,
-      bool printJson}) async {
+      bool? excludeTestFiles: false,
+      required bool printJson}) async {
     var collector = new LcovCollector(
         packageRoot: packageRoot,
         packagesPath: packagesPath,
@@ -103,14 +103,14 @@ class CommandLineClient {
         printJson: printJson);
   }
 
-  Future<CoverallsResult> uploadToCoveralls(String coverageResult,
+  Future<CoverallsResult?> uploadToCoveralls(String coverageResult,
       {ProcessSystem processSystem: const ProcessSystem(),
-      String coverallsAddress,
+      String? coverallsAddress,
       bool dryRun: false,
-      bool throwOnConnectivityError: false,
+      bool? throwOnConnectivityError: false,
       int retry: 0,
-      bool excludeTestFiles: false,
-      bool printJson}) async {
+      bool? excludeTestFiles: false,
+      required bool printJson}) async {
     var lcov = LcovDocument.parse(coverageResult);
 
     var serviceName = travis.getServiceName(Platform.environment);
@@ -136,7 +136,7 @@ class CommandLineClient {
       var encoded = json.encode(report);
       return _sendLoop(endpoint, encoded, retry: retry);
     } catch (e, stack) {
-      if (throwOnConnectivityError) rethrow;
+      if (throwOnConnectivityError!) rethrow;
       stderr.writeln('Error sending results');
       stderr.writeln(e);
       stderr.writeln(new Chain.forTrace(stack).terse);

@@ -26,7 +26,7 @@ abstract class GitPerson {
   static String getPersonMail(String str) {
     var mailCandidate = new RegExp(r"<(.*?)>").firstMatch(str);
     if (null == mailCandidate) return "Unknown";
-    var mail = mailCandidate.group(0);
+    var mail = mailCandidate.group(0)!;
     return mail.substring(1, mail.length - 1);
   }
 }
@@ -51,7 +51,7 @@ class GitCommit {
 
   GitCommit(this.id, this.author, this.committer, this.message);
 
-  static GitCommit getCommit(Directory dir, String id,
+  static GitCommit getCommit(Directory dir, String? id,
       {ProcessSystem processSystem: const ProcessSystem()}) {
     var args = ["show", "$id", "--format=full", "--quiet"];
     var res =
@@ -121,15 +121,15 @@ class GitRemote {
 }
 
 class GitBranch {
-  final String name;
-  final String reference;
-  final String id;
+  final String? name;
+  final String? reference;
+  final String? id;
 
   GitBranch(this.name, this.reference, this.id);
 
-  static String getCurrentBranchName(Directory dir,
+  static String? getCurrentBranchName(Directory dir,
       {ProcessSystem processSystem: const ProcessSystem(),
-      Map<String, String> environment}) {
+      Map<String, String>? environment}) {
     if (null == environment) environment = Platform.environment;
     if (null != environment["CI_BRANCH"]) return environment["CI_BRANCH"];
 
@@ -161,7 +161,7 @@ class GitBranch {
 }
 
 class GitData {
-  final String branch;
+  final String? branch;
   final List<GitRemote> remotes;
   final GitCommit headCommit;
 

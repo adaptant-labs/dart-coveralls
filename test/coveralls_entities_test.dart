@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 
 import 'mock_classes.dart';
 
-void _expectLineValue(LineValue lv, int lineNumber, int lineCount) {
+void _expectLineValue(LineValue lv, int lineNumber, int? lineCount) {
   expect(lv.lineNumber, equals(lineNumber));
   expect(lv.lineCount, equals(lineCount));
 }

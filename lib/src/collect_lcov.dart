@@ -37,7 +37,7 @@ class LcovPart {
     var firstLineEnd = lcovPart.indexOf("\n");
     var heading = lcovPart.substring(0, firstLineEnd);
 
-    var end = lcovPart.indexOf("\nend_of_record");
+    int? end = lcovPart.indexOf("\nend_of_record");
     if (-1 == end) end = null; // If "end_of_record" is missing, take rest
     var content =
         lcovPart.substring(firstLineEnd + 1, end); // Skip newline symbol
@@ -51,9 +51,9 @@ class LcovPart {
 }
 
 class LcovCollector {
-  final String sdkRoot;
-  final String packageRoot;
-  final String packagesPath;
+  final String? sdkRoot;
+  final String? packageRoot;
+  final String? packagesPath;
   final ProcessSystem processSystem;
 
   LcovCollector(
@@ -75,7 +75,7 @@ class LcovCollector {
   /// Returns an LCOV string of the tested [File].
   ///
   /// Calculates and returns LCOV information of the tested [File].
-  Future<String> getLcovInformation(String testFile) async {
+  Future<String?> getLcovInformation(String testFile) async {
     if (!p.isAbsolute(testFile)) {
       throw new ArgumentError.value(
           testFile, 'testFile', 'Must be an absolute path.');
@@ -100,11 +100,11 @@ class LcovCollector {
       resolver = new Resolver(packagesPath: packagesPath, sdkRoot: sdkRoot);
     }
     var formatter = new LcovFormatter(resolver);
-    return formatter.format(hitmap);
+    return formatter.format(hitmap as Map<String, Map<int, int>>);
   }
 
   /// Generates and returns a coverage json file
-  Future<List<Map<String, dynamic>>> _getCoverageJson(String testFile) async {
+  Future<List<Map<String, dynamic>>?> _getCoverageJson(String testFile) async {
     bool terminated = false;
 
     var dartArgs = ["--pause-isolates-on-exit", "--enable-vm-service"];
@@ -126,7 +126,7 @@ class LcovCollector {
 
     Completer<Uri> hostCompleter = new Completer<Uri>();
     process.stdout.transform(utf8.decoder).listen((data) {
-      Uri uri = util.extractObservatoryUri(data);
+      Uri? uri = util.extractObservatoryUri(data);
       if (uri != null) {
         hostCompleter.complete(uri);
       }

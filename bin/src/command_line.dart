@@ -19,8 +19,8 @@ abstract class CommandLinePart {
   CommandLinePart(this.parser);
 
   bool handleLogging(ArgResults res) {
-    String logLevelStr = res['log-level'];
-    if (Level.LEVELS.where((l) => l.name == logLevelStr.toUpperCase()).length ==
+    String? logLevelStr = res['log-level'];
+    if (Level.LEVELS.where((l) => l.name == logLevelStr!.toUpperCase()).length ==
         0) {
       print("Invalid Log level: ${logLevelStr}");
       return false;
@@ -45,7 +45,7 @@ abstract class CommandLinePart {
           print(rec.error);
         }
         if (rec.stackTrace != null) {
-          print(new Chain.forTrace(rec.stackTrace).terse);
+          print(new Chain.forTrace(rec.stackTrace!).terse);
         }
       });
     }
@@ -55,7 +55,7 @@ abstract class CommandLinePart {
 
   /// Performs checks on options --packages and --token
   /// before returning a `CommandLineClient` instance.
-  CommandLineClient getCommandLineClient(ArgResults res) {
+  CommandLineClient? getCommandLineClient(ArgResults res) {
     var token = res["token"];
     token = CommandLineClient.getToken(token, Platform.environment);
     if (token == null) {
@@ -68,7 +68,7 @@ abstract class CommandLinePart {
     // We don't print out the token here as it could end up in public build logs.
     _log.info("Token is ${token.isEmpty ? 'empty' : 'not empty'}");
 
-    FileSystemEntity pRoot = handlePackages(res);
+    FileSystemEntity? pRoot = handlePackages(res);
     if (pRoot == null) {
       return null;
     }
@@ -78,7 +78,7 @@ abstract class CommandLinePart {
         token: token);
   }
 
-  FileSystemEntity handlePackages(ArgResults res) {
+  FileSystemEntity? handlePackages(ArgResults res) {
     String pFilePath = res["packages"] ?? ".packages";
     FileSystemEntity pRoot = File(pFilePath);
     String type = "file";
@@ -112,7 +112,7 @@ abstract class CommandLinePart {
 
   Future parseAndExecute(List<String> args) => execute(parser.parse(args));
 
-  Future execute(ArgResults res);
+  Future execute(ArgResults? res);
 }
 
 class CommandLineHubBuilder {
@@ -122,7 +122,7 @@ class CommandLineHubBuilder {
     _parts[new PartInfo(name, description: description)] = part;
   }
 
-  CommandLinePart removePart(String name) => _parts.remove(name);
+  CommandLinePart? removePart(String name) => _parts.remove(name);
 
   CommandLineHub build() => new CommandLineHub._(_parts);
 }
@@ -134,8 +134,8 @@ class CommandLineHub extends CommandLinePart {
       : _parts = parts,
         super(_initializeParser(parts));
 
-  Future execute(ArgResults results) async {
-    if (results["help"]) {
+  Future execute(ArgResults? results) async {
+    if (results!["help"]) {
       print(usage);
       return;
     }
@@ -143,11 +143,11 @@ class CommandLineHub extends CommandLinePart {
       print(usage);
       return;
     }
-    var part = partByName(results.command.name);
+    var part = partByName(results.command!.name)!;
     await part.execute(results.command);
   }
 
-  CommandLinePart partByName(String name) {
+  CommandLinePart? partByName(String? name) {
     var partInfo = _parts.keys.firstWhere((info) => info.name == name);
     return _parts[partInfo];
   }
@@ -178,7 +178,7 @@ class PartInfo {
 
   int get hashCode => name.hashCode;
 
-  String toString([int nameLength]) {
+  String toString([int? nameLength]) {
     if (null == nameLength) nameLength = name.length;
     return "  ${name.padRight(nameLength)}\t$description";
   }

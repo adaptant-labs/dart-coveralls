@@ -11,9 +11,9 @@ import 'git_data.dart';
 import 'log.dart';
 
 class PackageFilter {
-  final bool excludeTestFiles;
+  final bool? excludeTestFiles;
   final PackageDartFiles dartFiles;
-  final String packageName;
+  final String? packageName;
 
   PackageFilter(this.packageName, this.dartFiles,
       {this.excludeTestFiles: false});
@@ -28,7 +28,7 @@ class PackageFilter {
       [FileSystem fileSystem = const LocalFileSystem()]) {
     log.info("ANALYZING $fileName");
 
-    if (fileName.startsWith(packageName)) {
+    if (fileName.startsWith(packageName!)) {
       log.info("  ADDING $fileName");
       return true;
     }
@@ -38,7 +38,7 @@ class PackageFilter {
         () => "  implementation file? ${dartFiles.isImplementationFile(file)}");
     log.info(() => "  test file? ${dartFiles.isTestFile(file)}");
     if (dartFiles.isImplementationFile(file) ||
-        (!excludeTestFiles && dartFiles.isTestFile(file))) {
+        (!excludeTestFiles! && dartFiles.isTestFile(file))) {
       log.info("  ADDING $fileName");
       return true;
     }
@@ -50,7 +50,7 @@ class PackageFilter {
   ///
   /// This searches [projectDirectory] for a yaml file, which it then
   /// parses for the top level attribute name, which it then returns.
-  static String getPackageName(String projectDirectory,
+  static String? getPackageName(String projectDirectory,
       [FileSystem fileSystem = const LocalFileSystem()]) {
     var pubspecFile = fileSystem.file(p.join(projectDirectory, "pubspec.yaml"));
     var pubspecContent = pubspecFile.readAsStringSync();
@@ -195,7 +195,7 @@ class Coverage {
 /// A [LineValue] represents a single line in an LCOV-File
 class LineValue {
   final int lineNumber;
-  final int lineCount;
+  final int? lineCount;
 
   /// Instantiates a [LineValue] with the given line number and line count
   LineValue(this.lineNumber, this.lineCount);
@@ -224,7 +224,7 @@ class SourceFileReports {
   SourceFileReports(this.sourceFileReports);
 
   static SourceFileReports parse(LcovDocument lcov, String projectDirectory,
-      {bool excludeTestFiles: false}) {
+      {bool? excludeTestFiles: false}) {
     var filter = new PackageFilter.from(projectDirectory,
         excludeTestFiles: excludeTestFiles);
 
@@ -239,18 +239,18 @@ class SourceFileReports {
 }
 
 class CoverallsReport {
-  final String repoToken;
+  final String? repoToken;
   final GitData gitData;
   final SourceFileReports sourceFileReports;
-  final String serviceName;
-  final String serviceJobId;
+  final String? serviceName;
+  final String? serviceJobId;
 
   CoverallsReport(this.repoToken, this.sourceFileReports, this.gitData,
       {this.serviceName, this.serviceJobId});
 
   static CoverallsReport parse(
-      String repoToken, LcovDocument lcov, String projectDirectory,
-      {String serviceName, String serviceJobId, bool excludeTestFiles: false}) {
+      String? repoToken, LcovDocument lcov, String projectDirectory,
+      {String? serviceName, String? serviceJobId, bool? excludeTestFiles: false}) {
     var gitData =
         GitData.getGitData(const LocalFileSystem().directory(projectDirectory));
     var reports = SourceFileReports.parse(lcov, projectDirectory,
@@ -280,7 +280,7 @@ class CoverallsReport {
 
 /// Represents a successful coverage report to Coveralls.
 class CoverallsResult {
-  final String message;
+  final String? message;
   final Uri url;
 
   CoverallsResult(this.message, this.url);
